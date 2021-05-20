@@ -1,5 +1,8 @@
 package demo.shared;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Connection;
@@ -51,18 +54,39 @@ public class TableHelper {
             stmt.execute(DROP_TABLE);
             stmt.execute(CREATE_TABLE);
         }
-    };
+    }
+
+    public static void createTableWithIndex(Connection connection) throws Exception {
+        InputStream in = TableHelper.class.getResourceAsStream("/create.sql");
+        StringBuilder sb = new StringBuilder();
+        try (Statement stmt = connection.createStatement()) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line).append("\n");
+                    if (line.endsWith(";")) {
+                        System.out.println(sb);
+                        stmt.execute(sb.toString());
+                        sb.setLength(0);
+                    }
+                }
+            }
+        }
+    }
+
+
 
     static UUID type = UUID.fromString("00000000-0000-0000-0000-000000003114");
     static UUID user = UUID.fromString("00000000-0000-0000-0000-000000900001");
+    static UUID asset = UUID.fromString("00000000-0000-0000-0000-000000008001");
 
     //String.format("('%s'::uuid)", domain)
     public static void setParameters(PreparedStatement pstmt, int index) throws SQLException {
-        setObject(pstmt, 1, UUID.randomUUID());
-        setObject(pstmt, 2, type);
-        setObject(pstmt, 3, user);
-        setObject(pstmt, 4, user);
-        setObject(pstmt, 5, user);
+        setObject(pstmt, 1, UUID.randomUUID()); //id
+        setObject(pstmt, 2, type); //type
+        setObject(pstmt, 3, user); //creator
+        setObject(pstmt, 4, user); //modifiedby
+        setObject(pstmt, 5, asset); //owner
         setObject(pstmt, 6, 0);
         setObject(pstmt, 7, 0);
         setObject(pstmt, 8, null);
@@ -79,7 +103,7 @@ public class TableHelper {
         sb.append(type).append("\t");
         sb.append(user).append("\t");
         sb.append(user).append("\t");
-        sb.append(user).append("\t");
+        sb.append(asset).append("\t");
         sb.append(0).append("\t");
         sb.append(0).append("\t");
         sb.append("\\N").append("\t");

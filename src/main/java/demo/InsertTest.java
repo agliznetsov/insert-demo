@@ -17,7 +17,7 @@ public class InsertTest {
 
 	final String properties = "src/main/resources/postgres.properties";
 	final int batchSize = 50_000;
-	final int totalCount = 5_000_000;
+	final int totalCount = 1_000_000;
 
 	public static void main(String[] args) throws Exception {
 		new InsertTest().run();
@@ -26,7 +26,7 @@ public class InsertTest {
 	private void run() throws Exception {
 		Supplier<Connection> connectionSuplier = new SimpleConnectionProvider(properties);
 		try (Connection connection = connectionSuplier.get()) {
-			TableHelper.createTable(connection);
+			TableHelper.createTableWithIndex(connection);
 			connection.setAutoCommit(false);
 			BenchmarkMeter.meter(() -> insertData(connection));
 		}
