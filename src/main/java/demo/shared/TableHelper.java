@@ -16,10 +16,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 
-import javax.sql.DataSource;
-
-import org.postgresql.jdbc.PgConnection;
-
 public class TableHelper {
 
     public static final String INSERT = "insert into attributes_copy (id, type, creator, modifiedby, owner, creationdate, lastmodified, date_time, numeric_value, "
@@ -29,35 +25,9 @@ public class TableHelper {
     public final static String COPY = "COPY attributes_copy (id, type, creator, modifiedby, owner, creationdate, lastmodified, date_time, numeric_value, "
             + "opt_lock, is_system, boolean_value, attr_type, expression_long) FROM STDIN WITH (FORMAT TEXT, ENCODING 'UTF-8', DELIMITER '\t', HEADER false)";
 
-    public static final String CREATE_TABLE = "create table attributes_copy\n"
-            + "(\n"
-            + "    id uuid not null primary key,\n"
-            + "    type uuid not null,\n"
-            + "    creator uuid,\n"
-            + "    modifiedby uuid,\n"
-            + "    owner uuid,\n"
-            + "    creationdate bigint,\n"
-            + "    lastmodified bigint,\n"
-            + "    date_time bigint,\n"
-            + "    numeric_value double precision,\n"
-            + "    opt_lock integer,\n"
-            + "    is_system boolean,\n"
-            + "    boolean_value boolean,\n"
-            + "    attr_type varchar(3) not null,\n"
-            + "    expression_long text\n"
-            + ")";
 
-    public static final String DROP_TABLE = "DROP TABLE IF EXISTS attributes_copy";
-
-    public static void createTable(Connection connection) throws SQLException {
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(DROP_TABLE);
-            stmt.execute(CREATE_TABLE);
-        }
-    }
-
-    public static void createTableWithIndex(Connection connection) throws Exception {
-        InputStream in = TableHelper.class.getResourceAsStream("/create.sql");
+    public static void createTable(Connection connection, String path) throws Exception {
+        InputStream in = TableHelper.class.getResourceAsStream(path);
         StringBuilder sb = new StringBuilder();
         try (Statement stmt = connection.createStatement()) {
             try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {

@@ -1,0 +1,15 @@
+version: '2.4'
+
+services:
+
+  postgres:
+#    image: mirror-docker.repository.collibra.io/postgres:10.16
+    image: docker-delivery.repository.collibra.io/prod/dgc-db-upgrade:2021.05
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: dgc
+      POSTGRES_USER: dgc
+      POSTGRES_PASSWORD: dgc
+      PGUSER: dgc
+

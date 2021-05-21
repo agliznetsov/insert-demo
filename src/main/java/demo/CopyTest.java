@@ -28,9 +28,11 @@ public class CopyTest {
 	private void run() throws Exception {
 		Supplier<Connection> connectionSuplier = new SimpleConnectionProvider(properties);
 		try (Connection connection = connectionSuplier.get()) {
-			TableHelper.createTableWithIndex(connection);
+			TableHelper.createTable(connection, "/create-table-full.sql");
 			connection.setAutoCommit(false);
-			BenchmarkMeter.meter(() -> insertData(connection));
+			BenchmarkMeter.start();
+			insertData(connection);
+			BenchmarkMeter.end(totalCount, 1);
 		}
 	}
 

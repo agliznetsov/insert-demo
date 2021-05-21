@@ -2,7 +2,11 @@ package demo;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -18,37 +22,58 @@ public class InsertTest {
 	final String properties = "src/main/resources/postgres.properties";
 	final int batchSize = 50_000;
 	final int totalCount = 1_000_000;
+	final int threadCount = 1;
+	final ExecutorService executor = Executors.newCachedThreadPool();
+	Supplier<Connection> connectionSupplier;
 
 	public static void main(String[] args) throws Exception {
 		new InsertTest().run();
 	}
 
 	private void run() throws Exception {
-		Supplier<Connection> connectionSuplier = new SimpleConnectionProvider(properties);
-		try (Connection connection = connectionSuplier.get()) {
-			TableHelper.createTableWithIndex(connection);
-			connection.setAutoCommit(false);
-			BenchmarkMeter.meter(() -> insertData(connection));
+		connectionSupplier = new SimpleConnectionProvider(properties);
+		try (Connection connection = connectionSupplier.get()) {
+			TableHelper.createTable(connection, "/create-table-only.sql");
+		}
+
+		BenchmarkMeter.start();
+		List<Future> futures = new ArrayList<>();
+		for (int i = 0; i < threadCount; i++) {
+			futures.add(executor.submit(this::insertData));
+		}
+		futures.forEach(this::resolveFuture);
+		BenchmarkMeter.end(totalCount * threadCount, threadCount);
+		System.exit(0);
+	}
+
+	private void resolveFuture(Future future) {
+		try {
+			future.get();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
-	private long insertData(Connection connection) {
+	private long insertData() throws Exception {
+		LOGGER.info("Thread started");
 		long start = System.currentTimeMillis();
-		try (PreparedStatement pstmt = connection.prepareStatement(TableHelper.INSERT)) {
-			for (int i = 1; i <= totalCount; i++) {
-				TableHelper.setParameters(pstmt, i);
-				pstmt.addBatch();
-				if (i % batchSize == 0) {
-					pstmt.executeBatch();
-					connection.commit();
-					long end = System.currentTimeMillis();
-					LOGGER.info("Rows {} batch time: {}", i, (end - start));
-					start = end;
-				}
+		Connection connection = connectionSupplier.get();
+		connection.setAutoCommit(false);
+		PreparedStatement pstmt = connection.prepareStatement(TableHelper.INSERT);
+		for (int i = 1; i <= totalCount; i++) {
+			TableHelper.setParameters(pstmt, i);
+			pstmt.addBatch();
+			if (i % batchSize == 0) {
+				pstmt.executeBatch();
+				connection.commit();
+				long end = System.currentTimeMillis();
+				LOGGER.info("Rows {} batch time: {}", i, (end - start));
+				start = end;
 			}
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
 		}
+		pstmt.close();
+		connection.close();
+		LOGGER.info("Thread stopped");
 		return totalCount;
 	}
 }
