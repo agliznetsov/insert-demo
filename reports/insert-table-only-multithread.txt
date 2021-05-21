@@ -1,0 +1,4 @@
+Threads: 1 Rows: 5000000 Time: 73973 Rows/sec: 67000 MAssets/hour: 24
+Threads: 2 Rows: 5000000 Time: 46213 Rows/sec: 108000 MAssets/hour: 38
+Threads: 4 Rows: 5000000 Time: 39527 Rows/sec: 126000 MAssets/hour: 45
+Threads: 8 Rows: 5000000 Time: 41663 Rows/sec: 120000 MAssets/hour: 43

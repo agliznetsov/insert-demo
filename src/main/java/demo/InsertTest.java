@@ -21,8 +21,8 @@ public class InsertTest {
 
 	final String properties = "src/main/resources/postgres.properties";
 	final int batchSize = 50_000;
-	final int totalCount = 60_000_000;
-	final int threadCount = 1;
+	final int totalCount = 5_000_000;
+	final int threadCount = 4;
 	final ExecutorService executor = Executors.newCachedThreadPool();
 	Supplier<Connection> connectionSupplier;
 
