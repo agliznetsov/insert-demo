@@ -21,7 +21,7 @@ public class InsertTest {
 
 	final String properties = "src/main/resources/postgres.properties";
 	final int batchSize = 50_000;
-	final int totalCount = 5_000_000;
+	final int totalCount = 1_000_000;
 	final int threadCount = 4;
 	final ExecutorService executor = Executors.newCachedThreadPool();
 	Supplier<Connection> connectionSupplier;
@@ -41,7 +41,8 @@ public class InsertTest {
 		BenchmarkMeter.start();
 		List<Future> futures = new ArrayList<>();
 		for (int i = 0; i < threadCount; i++) {
-			futures.add(executor.submit(this::insertData));
+			boolean print = i == 0;
+			futures.add(executor.submit(() -> insertData(print)));
 		}
 		futures.forEach(this::resolveFuture);
 		BenchmarkMeter.end(totalCount, threadCount);
@@ -56,9 +57,10 @@ public class InsertTest {
 		}
 	}
 
-	private long insertData() throws Exception {
+	private long insertData(boolean print) throws Exception {
 		LOGGER.info("Thread started");
-		long start = System.currentTimeMillis();
+		final long start = System.currentTimeMillis();
+		long batchStart = start;
 		Connection connection = connectionSupplier.get();
 		connection.setAutoCommit(false);
 //		PreparedStatement pstmt = connection.prepareStatement(TableHelper.INSERT_SHORT);
@@ -70,9 +72,13 @@ public class InsertTest {
 			if (i % batchSize == 0) {
 				pstmt.executeBatch();
 				connection.commit();
-				long end = System.currentTimeMillis();
-				LOGGER.info("Rows {} batch time: {}", i, (end - start));
-				start = end;
+				long now = System.currentTimeMillis();
+				long batchTime = (now - batchStart);
+				long totalTime = (now - start) / 1000;
+				batchStart = now;
+				if (print) {
+					System.out.println(i * threadCount + "," + batchTime + "," + totalTime);
+				}
 			}
 		}
 		pstmt.executeBatch();

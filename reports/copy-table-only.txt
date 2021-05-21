@@ -199,4 +199,5 @@
 10:53:31.322 [main] INFO  demo.shared.BenchmarkMeter - Rows 9950000 batch time: 1082
 10:53:32.351 [main] INFO  demo.shared.BenchmarkMeter - Rows 10000000 batch time: 1029
 
-10:53:32.351 [main] INFO  demo.shared.BenchmarkMeter - Threads: 1 Rows: 10000000 Time: 190470 Rows/sec: 52000 MAssets/hour: 18
+Threads: 1 Rows: 10000000 Time: 190470 Rows/sec: 52000 MAssets/hour: 18
+Threads: 4 Rows: 150000000 Time: 11566022 Rows/sec: 12000 MAssets/hour: 4

@@ -200,3 +200,6 @@
 09:48:06.633 [pool-1-thread-1] INFO  demo.shared.BenchmarkMeter - Rows 10000000 batch time: 1417
 
 09:48:06.634 [main] INFO  demo.shared.BenchmarkMeter - Threads: 1 Rows: 10000000 Time: 196490 Rows/sec: 50000 MAssets/hour: 18
+
+1M rows   = 115K row/sec
+150M rows = 7K row/sec
