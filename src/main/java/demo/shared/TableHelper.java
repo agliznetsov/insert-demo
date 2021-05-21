@@ -22,6 +22,10 @@ public class TableHelper {
             + "opt_lock, is_system, boolean_value, attr_type, expression_long) "
             + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
+    public static final String INSERT_SHORT = "insert into attributes_copy (id, type, owner, date_time, numeric_value, "
+            + "opt_lock, is_system, boolean_value, attr_type, expression_long) "
+            + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
     public final static String COPY = "COPY attributes_copy (id, type, creator, modifiedby, owner, creationdate, lastmodified, date_time, numeric_value, "
             + "opt_lock, is_system, boolean_value, attr_type, expression_long) FROM STDIN WITH (FORMAT TEXT, ENCODING 'UTF-8', DELIMITER '\t', HEADER false)";
 
@@ -50,7 +54,6 @@ public class TableHelper {
     static UUID user = UUID.fromString("00000000-0000-0000-0000-000000900001");
     static UUID asset = UUID.fromString("00000000-0000-0000-0000-000000008001");
 
-    //String.format("('%s'::uuid)", domain)
     public static void setParameters(PreparedStatement pstmt, int index) throws SQLException {
         setObject(pstmt, 1, UUID.randomUUID()); //id
         setObject(pstmt, 2, type); //type
@@ -66,6 +69,19 @@ public class TableHelper {
         setObject(pstmt, 12, null);
         setObject(pstmt, 13, "SA");
         setObject(pstmt, 14, "attribute value " + index);
+    }
+
+    public static void setParametersShort(PreparedStatement pstmt, int index) throws SQLException {
+        setObject(pstmt, 1, UUID.randomUUID()); //id
+        setObject(pstmt, 2, type); //type
+        setObject(pstmt, 3, asset); //type
+        setObject(pstmt, 4, null);
+        setObject(pstmt, 5, null);
+        setObject(pstmt, 6, 0);
+        setObject(pstmt, 7, false);
+        setObject(pstmt, 8, null);
+        setObject(pstmt, 9, "SA");
+        setObject(pstmt, 10, "attribute value " + index);
     }
 
     public static void addRow(StringBuilder sb, int index) {

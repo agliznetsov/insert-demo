@@ -19,7 +19,7 @@ public class CopyTest {
 
 	final String properties = "src/main/resources/postgres.properties";
 	final int batchSize = 50_000;
-	final int totalCount = 1_000_000;
+	final int totalCount = 10_000_000;
 
 	public static void main(String[] args) throws Exception {
 		new CopyTest().run();

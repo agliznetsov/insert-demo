@@ -21,7 +21,7 @@ public class InsertTest {
 
 	final String properties = "src/main/resources/postgres.properties";
 	final int batchSize = 50_000;
-	final int totalCount = 1_000_000;
+	final int totalCount = 60_000_000;
 	final int threadCount = 1;
 	final ExecutorService executor = Executors.newCachedThreadPool();
 	Supplier<Connection> connectionSupplier;
@@ -33,6 +33,8 @@ public class InsertTest {
 	private void run() throws Exception {
 		connectionSupplier = new SimpleConnectionProvider(properties);
 		try (Connection connection = connectionSupplier.get()) {
+//			TableHelper.createTable(connection, "/create-table-full.sql");
+//			TableHelper.createTable(connection, "/create-table-short.sql");
 			TableHelper.createTable(connection, "/create-table-only.sql");
 		}
 
@@ -42,7 +44,7 @@ public class InsertTest {
 			futures.add(executor.submit(this::insertData));
 		}
 		futures.forEach(this::resolveFuture);
-		BenchmarkMeter.end(totalCount * threadCount, threadCount);
+		BenchmarkMeter.end(totalCount, threadCount);
 		System.exit(0);
 	}
 
@@ -59,8 +61,10 @@ public class InsertTest {
 		long start = System.currentTimeMillis();
 		Connection connection = connectionSupplier.get();
 		connection.setAutoCommit(false);
+//		PreparedStatement pstmt = connection.prepareStatement(TableHelper.INSERT_SHORT);
 		PreparedStatement pstmt = connection.prepareStatement(TableHelper.INSERT);
-		for (int i = 1; i <= totalCount; i++) {
+		for (int i = 1; i <= totalCount / threadCount; i++) {
+//			TableHelper.setParametersShort(pstmt, i);
 			TableHelper.setParameters(pstmt, i);
 			pstmt.addBatch();
 			if (i % batchSize == 0) {
@@ -71,6 +75,8 @@ public class InsertTest {
 				start = end;
 			}
 		}
+		pstmt.executeBatch();
+		connection.commit();
 		pstmt.close();
 		connection.close();
 		LOGGER.info("Thread stopped");
