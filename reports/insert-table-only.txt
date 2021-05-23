@@ -751,8 +751,6 @@
 
 Threads: 4 Rows: 150000000 Time: 968947 Rows/sec: 154000
 
-1M: Threads: 4 Rows: 1000000 Time: 6219 Rows/sec: 160000
-
 2021-05-23 08:34:24.962 UTC [26] LOG:  checkpoints are occurring too frequently (13 seconds apart)
 2021-05-23 08:34:24.962 UTC [26] HINT:  Consider increasing the configuration parameter "max_wal_size".
 
