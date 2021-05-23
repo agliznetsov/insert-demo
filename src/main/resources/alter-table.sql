@@ -1,3 +1,5 @@
+select name, setting from pg_settings where name like '%wal_size%' or name like '%checkpoint%' order by name;
+
 -- 150M
 SELECT reltuples, relname FROM pg_catalog.pg_class WHERE relname = 'attributes_copy';
 
@@ -13,8 +15,14 @@ ALTER TABLE attributes_copy
 
 ALTER TABLE attributes_copy DISABLE TRIGGER ALL;
 ALTER TABLE attributes_copy ENABLE TRIGGER ALL;
+alter table attributes_copy drop constraint attributes_copy_pkey1;
 
--- attributes 4 indexes total time: 780s  1.3 sec per 1M index
+-- attributes 5 indexes total time: 1104s  1.47 sec per 1M index
+
+SELECT   tablename,    indexname FROM   pg_indexes where indexname like '%attributes%';
+
+-- 5m 14s
+alter table attributes_copy add constraint attributes_copy_pkey1 primary key (id);
 
 -- 5m 17s
 create index idx_attributes_1 on attributes_copy (id) where (((attr_type)::text = 'SA'::text) AND (expression_long IS NOT NULL));
@@ -34,7 +42,7 @@ SELECT reltuples, relname FROM pg_catalog.pg_class WHERE relname = 'attributes_f
 -- 1m 2s
 create index idx_attributes_flat_1 on attributes_flat (owner);
 
--- relations 6 indexes  total time : 6 * 75M * 1.3 =  585s
+-- relations 7 indexes  total time : 7 * 75M * 1.47 =  770s
 
 --create index idx_relations_source_target    on relations (source, target);
 --create index idx_relations_type_source    on relations (type, source);
@@ -43,7 +51,7 @@ create index idx_attributes_flat_1 on attributes_flat (owner);
 --create index relation_target    on relations (target);
 --create index relation_type    on relations (type);
 
--- representations 16 indexes 16 * 25M * 1.3 = 520s
+-- representations 17 indexes 17 * 25M * 1.47 = 624s
 
 --create unique index idx_representations_signifier_vocabulary    on representations (signifier, vocabulary);
 --create index repr_creationdate    on representations (creationdate);
