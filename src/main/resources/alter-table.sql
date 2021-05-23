@@ -28,6 +28,11 @@ create index idx_attributes_3 on attributes_copy (type);
 -- 2m 12s
 create index idx_attributes_4 on attributes_copy (owner);
 
+-- 25M
+SELECT reltuples, relname FROM pg_catalog.pg_class WHERE relname = 'attributes_flat';
+
+-- 1m 2s
+create index idx_attributes_flat_1 on attributes_flat (owner);
 
 -- relations 6 indexes  total time : 6 * 75M * 1.3 =  585s
 

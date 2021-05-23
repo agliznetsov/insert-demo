@@ -22,9 +22,8 @@ public class TableHelper {
             + "opt_lock, is_system, boolean_value, attr_type, expression_long) "
             + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    public static final String INSERT_SHORT = "insert into attributes_copy (id, type, owner, date_time, numeric_value, "
-            + "opt_lock, is_system, boolean_value, attr_type, expression_long) "
-            + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    public static final String INSERT_FLAT = "insert into attributes_flat (owner, type0, value0, type1, value1, type2, value2, type3, value3, type4, value4, type5, value5) "
+            + "values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     public final static String COPY = "COPY attributes_copy (id, type, creator, modifiedby, owner, creationdate, lastmodified, date_time, numeric_value, "
             + "opt_lock, is_system, boolean_value, attr_type, expression_long) FROM STDIN WITH (FORMAT TEXT, ENCODING 'UTF-8', DELIMITER '\t', HEADER false)";
@@ -71,17 +70,21 @@ public class TableHelper {
         setObject(pstmt, 14, "attribute value " + index);
     }
 
-    public static void setParametersShort(PreparedStatement pstmt, int index) throws SQLException {
-        setObject(pstmt, 1, UUID.randomUUID()); //id
-        setObject(pstmt, 2, type); //type
-        setObject(pstmt, 3, asset); //type
-        setObject(pstmt, 4, null);
-        setObject(pstmt, 5, null);
-        setObject(pstmt, 6, 0);
-        setObject(pstmt, 7, false);
-        setObject(pstmt, 8, null);
-        setObject(pstmt, 9, "SA");
-        setObject(pstmt, 10, "attribute value " + index);
+    public static void setParametersFlat(PreparedStatement pstmt, int index) throws SQLException {
+        String value = "attribute value " + index;
+        setObject(pstmt, 1, asset);
+        setObject(pstmt, 2, type);
+        setObject(pstmt, 3, value);
+        setObject(pstmt, 4, type);
+        setObject(pstmt, 5, value);
+        setObject(pstmt, 6, type);
+        setObject(pstmt, 7, value);
+        setObject(pstmt, 8, type);
+        setObject(pstmt, 9, value);
+        setObject(pstmt, 10, type);
+        setObject(pstmt, 11, value);
+        setObject(pstmt, 12, type);
+        setObject(pstmt, 13, value);
     }
 
     public static void addRow(StringBuilder sb, int index) {

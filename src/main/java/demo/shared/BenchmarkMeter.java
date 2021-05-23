@@ -16,9 +16,7 @@ public class BenchmarkMeter {
         long end = System.currentTimeMillis();
         long millis = (end - start);
         long rate = millis > 0 ? rowCount / millis : 0;
-        double assetSec = rowCount / 10.0 * 1000 / millis;
-        double assetHour = assetSec * 60 * 60 / 1_000_000;
-        LOGGER.info("Threads: {} Rows: {} Time: {} Rows/sec: {} MAssets/hour: {}",
-                threadCount, rowCount, millis, rate * 1000, (int)assetHour);
+        LOGGER.info("Threads: {} Rows: {} Time: {} Rows/sec: {}",
+                threadCount, rowCount, millis, rate * 1000);
     }
 }
